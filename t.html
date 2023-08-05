@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>今日时间</title>
+    <style>
+      html,
+      body {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      #today {
+        position: relative;
+        text-align: center;
+        padding: 8px 0;
+        z-index: 1;
+        font-size: 26px;
+      }
+      #container {
+        position: relative;
+        width: 100%;
+        line-height: 0;
+        padding: 0 8px 0 10px;
+        box-sizing: border-box;
+        border: 1px solid #eee;
+        z-index: 2;
+      }
+      #seconds {
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        font-size: 250px;
+        top: 120px;
+        z-index: 3;
+        color: #000;
+        text-shadow: -8px -5px #eee;
+      }
+      .cube {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background-color: #ddd;
+        border-radius: 2px;
+        border: 1px solid #fff;
+        box-sizing: border-box;
+      }
+      .active {
+        background-color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="today"></div>
+    <div id="container"></div>
+    <div id="seconds"></div>
+    <script>
+      var total = 24 * 60;
+      var today = document.getElementById("today");
+      var container = document.getElementById("container");
+      var seconds = document.getElementById("seconds");
+
+      init();
+      updateDay();
+      updateMinute();
+      updateSecond();
+
+      function init() {
+        var fragment = document.createDocumentFragment();
+
+        for (var i = 0; i < total; i++) {
+          var cube = document.createElement("span");
+          cube.className = "cube";
+          fragment.appendChild(cube);
+        }
+
+        container.appendChild(fragment);
+      }
+
+      function updateDay() {
+        var curr = new Date();
+        var year = curr.getFullYear();
+        var month = curr.getMonth() + 1;
+        var day = curr.getDate();
+
+        today.innerText =
+          "今日事 今日毕 (" + year + "年" + month + "月" + day + "日)";
+      }
+
+      function updateMinute() {
+        var curr = new Date();
+        var hours = curr.getUTCHours();
+        var minutes = curr.getUTCMinutes();
+        var currIndex = (hours + 8 > 23 ? 0 : hours + 8) * 60 + minutes;
+        var children = container.childNodes;
+
+        for (var i = 0; i < total; i++) {
+          children[i].className = i > currIndex ? "cube" : "cube active";
+        }
+
+        // 每个小时都检查一下日期
+        if (minutes === 0) {
+          updateDay();
+        }
+      }
+
+      function fmt(n) {
+        return n > 9 ? n : "0" + n;
+      }
+
+      function updateSecond() {
+        var curr = new Date();
+        var secs = curr.getSeconds();
+
+        seconds.innerText = fmt(secs);
+
+        setTimeout(function () {
+          updateSecond();
+        }, 1000);
+
+        // 不超过5秒时都去更新一下分钟
+        if (secs < 5) {
+          updateMinute();
+        }
+      }
+    </script>
+  </body>
+</html>
